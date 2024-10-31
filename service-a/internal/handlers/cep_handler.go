@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"regexp"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
@@ -50,4 +51,9 @@ func (h *CEPHandler) HandleCEP(w http.ResponseWriter, r *http.Request) {
 	if _, err := w.Write(resp.Body); err != nil {
 		http.Error(w, "error writing response", http.StatusInternalServerError)
 	}
+}
+
+func isValidCEP(cep string) bool {
+	match, _ := regexp.MatchString(`^\d{8}$`, cep)
+	return match
 }
