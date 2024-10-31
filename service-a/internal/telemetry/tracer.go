@@ -57,3 +57,9 @@ func InitTracer(serviceName, zipkinURL string) func() {
 func StartSpan(ctx context.Context, name string) (context.Context, trace.Span) {
 	return tracer.Start(ctx, name)
 }
+
+func AddSpanTags(span trace.Span, tags map[string]string) {
+	for key, value := range tags {
+		span.SetAttributes(attribute.String(key, value))
+	}
+}
