@@ -53,3 +53,7 @@ func InitTracer(serviceName, zipkinURL string) func() {
 		}
 	}
 }
+
+func StartSpan(ctx context.Context, name string) (context.Context, trace.Span) {
+	return tracer.Start(ctx, name)
+}
