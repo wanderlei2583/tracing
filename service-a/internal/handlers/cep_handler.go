@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"bytes"
+	"context"
 	"encoding/json"
 	"net/http"
 	"regexp"
@@ -56,4 +58,25 @@ func (h *CEPHandler) HandleCEP(w http.ResponseWriter, r *http.Request) {
 func isValidCEP(cep string) bool {
 	match, _ := regexp.MatchString(`^\d{8}$`, cep)
 	return match
+}
+
+func (h *CEPHandler) forwardToServiceB(
+	ctx context.Context,
+	req CEPRequest,
+) (*http.Response, error) {
+	_, span := h.tracer.Start(ctx, "forward_to_service_b")
+	defer span.End()
+
+	body, _ := json.Marshal(req)
+	request, err := http.NewRequestWithContext(
+		ctx,
+		"POST",
+		h.serviceBURL+"/temperature",
+		bytes.NewBuffer(body),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return http.DefaultClient.Do(request)
 }
