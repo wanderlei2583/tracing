@@ -5,13 +5,13 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/go-chi/chi/v5"
+	chi "github.com/go-chi/chi/v5"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"golang.org/x/telemetry"
 )
 
 func main() {
-	cleanup := telemetry.InitTelemetry(
+	cleanup := telemetry.InitTracer(
 		"service-a",
 		"http://zipkin:9411/api/v2/spans",
 	)
