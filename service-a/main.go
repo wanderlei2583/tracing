@@ -7,7 +7,9 @@ import (
 
 	chi "github.com/go-chi/chi/v5"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
-	"golang.org/x/telemetry"
+
+	"service-a/internal/handlers"
+	"service-a/internal/telemetry"
 )
 
 func main() {
