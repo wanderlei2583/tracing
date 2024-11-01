@@ -7,6 +7,7 @@ import (
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
 	"go.opentelemetry.io/otel/exporters/zipkin"
 	"go.opentelemetry.io/otel/sdk/resource"
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
@@ -63,4 +64,9 @@ func AddSpanTags(span trace.Span, tags map[string]string) {
 	for key, value := range tags {
 		span.SetAttributes(attribute.String(key, value))
 	}
+}
+
+func RecordError(span trace.Span, err error) {
+	span.RecordError(err)
+	span.SetStatus(codes.Error, err.Error())
 }
