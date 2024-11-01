@@ -70,3 +70,15 @@ func RecordError(span trace.Span, err error) {
 	span.RecordError(err)
 	span.SetStatus(codes.Error, err.Error())
 }
+
+func StartExternalServiceSpan(
+	ctx context.Context,
+	name, serviceType string,
+) (context.Context, trace.Span) {
+	ctx, span := tracer.Start(ctx, name)
+	span.SetAttributes(
+		attribute.String("external.service", serviceType),
+		attribute.String("span.type", "external"),
+	)
+	return ctx, span
+}
