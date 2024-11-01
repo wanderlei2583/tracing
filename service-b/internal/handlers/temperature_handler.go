@@ -1,9 +1,10 @@
 package handlers
 
 import (
-	"go.opentelemetry.io/otel/trace"
-
 	"service-b/internal/services"
+
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 )
 
 type TemperatureHandler struct {
@@ -17,4 +18,15 @@ type TemperatureResponse struct {
 	TempC float64 `json:"temp_C"`
 	TempF float64 `json:"temp_F"`
 	TempK float64 `json:"temp_K"`
+}
+
+func NewTemperatureHandler(
+	cep *services.CEPService,
+	weather *services.WeatherService,
+) *TemperatureHandler {
+	return &TemperatureHandler{
+		cepService:     cep,
+		weatherService: weather,
+		tracer:         otel.Tracer("service-b"),
+	}
 }
