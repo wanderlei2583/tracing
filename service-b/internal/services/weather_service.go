@@ -9,3 +9,7 @@ type weatherResponse struct {
 		TempC float64 `json:"temp_c"`
 	} `json:"current"`
 }
+
+func NewWeatherService(apiKey string) *WeatherService {
+	return &WeatherService{apiKey: apiKey}
+}
