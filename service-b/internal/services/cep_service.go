@@ -15,3 +15,7 @@ type viaCEPResponse struct {
 	City string `json:"localidade"`
 	Erro bool   `json:"erro"`
 }
+
+func NewCEPService(baseURL string) *CEPService {
+	return &CEPService{baseURL: baseURL}
+}
