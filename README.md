@@ -106,7 +106,7 @@ clean     - Remove containers, volumes e arquivos temporários
 ```bash
 curl -X POST http://localhost:8080/cep \
   -H "Content-Type: application/json" \
-  -d '{"cep": "67400018"}'
+  -d '{"cep": "67400018"}' | jq
 ```
 
 ### Respostas Possíveis
