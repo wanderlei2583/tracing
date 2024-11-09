@@ -121,7 +121,7 @@ curl -X POST http://localhost:8080/cep \
 }
 ```
 
-![Resposta 200 OK](figs/fig_02.jpg)
+![Resposta 200 OK](figs/fig_03.jpg)
 
 2. CEP Inválido (422 Unprocessable Entity):
 ```json
