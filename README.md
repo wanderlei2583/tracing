@@ -130,12 +130,16 @@ curl -X POST http://localhost:8080/cep \
 }
 ```
 
+![Resposta 422 Unprocessable Entity](figs/fig_05.jpg)
+
 3. CEP Não Encontrado (404 Not Found):
 ```json
 {
     "message": "can not find zipcode"
 }
 ```
+
+![Resposta 404 Not Found](figs/fig_04.jpg)
 
 ## 📊 Monitoramento com Zipkin
 
