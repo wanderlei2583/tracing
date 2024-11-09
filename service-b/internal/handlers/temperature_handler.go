@@ -3,10 +3,11 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"service-b/internal/services"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/trace"
+
+	"service-b/internal/services"
 )
 
 type TemperatureHandler struct {
@@ -20,6 +21,10 @@ type TemperatureResponse struct {
 	TempC float64 `json:"temp_C"`
 	TempF float64 `json:"temp_F"`
 	TempK float64 `json:"temp_K"`
+}
+
+type ErrorResponse struct {
+	Message string `json:"message"`
 }
 
 func NewTemperatureHandler(
@@ -45,27 +50,36 @@ func (h *TemperatureHandler) HandleTemperature(
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid request", http.StatusBadRequest)
+		h.sendError(w, "invalid request", http.StatusBadRequest)
 		return
 	}
 
 	city, err := h.cepService.GetCity(ctx, req.CEP)
 	if err != nil {
-		if err == services.ErrInvalidCEP {
-			http.Error(w, "invalid zipcode", http.StatusUnprocessableEntity)
+		switch err {
+		case services.ErrInvalidCEP:
+			h.sendError(w, "invalid zipcode", http.StatusUnprocessableEntity)
+			return
+		case services.ErrCEPNotFound:
+			h.sendError(w, "can not find zipcode", http.StatusNotFound)
+			return
+		default:
+			h.sendError(
+				w,
+				"internal server error",
+				http.StatusInternalServerError,
+			)
 			return
 		}
-		if err == services.ErrCEPNotFound {
-			http.Error(w, "can not find zipcode", http.StatusNotFound)
-			return
-		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
 	}
 
 	tempC, err := h.weatherService.GetTemperature(ctx, city)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.sendError(
+			w,
+			"error getting temperature",
+			http.StatusInternalServerError,
+		)
 		return
 	}
 
@@ -80,5 +94,16 @@ func (h *TemperatureHandler) HandleTemperature(
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(response)
+}
+
+func (h *TemperatureHandler) sendError(
+	w http.ResponseWriter,
+	message string,
+	statusCode int,
+) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	json.NewEncoder(w).Encode(ErrorResponse{Message: message})
 }
