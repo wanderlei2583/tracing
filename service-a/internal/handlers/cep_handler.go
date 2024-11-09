@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"io"
 	"net/http"
 	"regexp"
 
@@ -44,13 +45,24 @@ func (h *CEPHandler) HandleCEP(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := h.forwardToServiceB(ctx, req)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(
+			w,
+			"error forwarding request",
+			http.StatusInternalServerError,
+		)
+		return
+	}
+	defer resp.Body.Close()
+
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		http.Error(w, "error reading response", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(resp.StatusCode)
-	if _, err := w.Write(resp.Body); err != nil {
+	if _, err := w.Write(body); err != nil {
 		http.Error(w, "error writing response", http.StatusInternalServerError)
 	}
 }
